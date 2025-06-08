@@ -4,8 +4,9 @@
       { "src": "api/app.py", "use": "@vercel/python" }
     ],
     "routes": [
-      { "src": "/send-email", "dest": "api/app.py" },
-      { "src": "/contact", "dest": "/contact.html" },
-      { "src": "/portfolio", "dest": "/portfolio.html" }
+      { "src": "/send-email", "dest": "api/app.py" }
+    ],
+    "rewrites": [
+      { "source": "/(.*)", "destination": "/" }
     ]
-  }
+}

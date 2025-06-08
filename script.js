@@ -73,7 +73,7 @@ document.getElementById('contactForm').addEventListener('submit', async function
         submitButton.textContent = 'Sending...';
         
         // Send data to backend
-        const response = await fetch('/send-email', {
+        const response = await fetch('http://localhost:5000/send-email', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
