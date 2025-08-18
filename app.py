@@ -20,6 +20,8 @@ SENDER_PASSWORD = os.getenv('EMAIL_PASSWORD')  # Your Gmail app password
 
 @app.route('/send-email', methods=['POST'])
 def send_email():
+    if request.method == 'GET':
+        return jsonify({"message": "Send a POST request to send an email"}), 200
     try:
         data = request.json
         name = data.get('name')
