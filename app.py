@@ -7,14 +7,14 @@ import os
 
 app = Flask(__name__)
 
-# Allow only your GitHub Pages domain
+# Allow only your GitHub Pages domain (frontend)
 CORS(app, resources={r"/*": {"origins": "https://syedfarhan110.github.io"}})
 
-# Email configuration (values come from Render environment variables)
+# Email configuration (use environment variables in Render)
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
-SENDER_EMAIL = os.getenv("EMAIL_USER")       # Gmail address
-SENDER_PASSWORD = os.getenv("EMAIL_PASSWORD")  # Gmail App Password
+SENDER_EMAIL = os.getenv("EMAIL_USER")        # Gmail address from Render environment
+SENDER_PASSWORD = os.getenv("EMAIL_PASSWORD") # Gmail App Password from Render environment
 
 
 @app.route("/")
@@ -30,13 +30,15 @@ def send_email():
         email = data.get("email")
         message = data.get("message")
 
-        # Create message
+        if not name or not email or not message:
+            return jsonify({"status": "error", "message": "All fields are required"}), 400
+
+        # Create email
         msg = MIMEMultipart()
         msg["From"] = SENDER_EMAIL
-        msg["To"] = SENDER_EMAIL  # Send to yourself
+        msg["To"] = SENDER_EMAIL  # send to yourself
         msg["Subject"] = f"Portfolio Contact from {name}"
 
-        # Email body
         body = f"""
         New contact form submission:
 
@@ -44,10 +46,9 @@ def send_email():
         Email: {email}
         Message: {message}
         """
-
         msg.attach(MIMEText(body, "plain"))
 
-        # Create SMTP session
+        # Connect to Gmail SMTP
         server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
         server.starttls()
         server.login(SENDER_EMAIL, SENDER_PASSWORD)
@@ -63,4 +64,6 @@ def send_email():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=False)
+    # Render provides PORT automatically
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)
