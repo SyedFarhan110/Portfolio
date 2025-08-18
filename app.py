@@ -8,7 +8,7 @@ import os
 app = Flask(__name__)
 
 # Allow only your GitHub Pages domain (frontend)
-CORS(app, resources={r"/*": {"origins": "https://syedfarhan110.github.io"}})
+CORS(app, resources={r"/*": {"origins": "https://syedfarhan110.github.io/Portfolio/"}})
 
 # Email configuration (use environment variables in Render)
 SMTP_SERVER = "smtp.gmail.com"
