@@ -6,7 +6,9 @@ from email.mime.multipart import MIMEMultipart
 import os
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
+
+# Allow only your GitHub Pages domain
+CORS(app, resources={r"/*": {"origins": "https://syedfarhan110.github.io"}})
 
 # Email configuration (values come from Render environment variables)
 SMTP_SERVER = "smtp.gmail.com"
@@ -60,6 +62,5 @@ def send_email():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 
-# Local run (Render ignores this, uses gunicorn instead)
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=False)
