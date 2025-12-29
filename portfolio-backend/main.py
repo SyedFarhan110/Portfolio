@@ -6,17 +6,18 @@ from dotenv import load_dotenv
 import aiosmtplib
 from email.message import EmailMessage
 
+# Load environment variables
 load_dotenv()
 
 EMAIL_USER = os.getenv("EMAIL_USER")
 EMAIL_PASS = os.getenv("EMAIL_PASS")
 
-app = FastAPI()
+app = FastAPI(title="Portfolio Backend API")
 
-# Enable CORS for your frontend
+# Enable CORS (allow frontend access)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, replace with your domain
+    allow_origins=["*"],  # Replace with frontend domain in production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -32,34 +33,32 @@ async def send_email(
     email: EmailStr = Form(...),
     message: str = Form(...)
 ):
-    if not name or not email or not message:
-        raise HTTPException(status_code=400, detail="All fields are required")
-    
     if not EMAIL_USER or not EMAIL_PASS:
-        raise HTTPException(status_code=500, detail="Email configuration missing")
+        raise HTTPException(
+            status_code=500,
+            detail="Email configuration missing on server"
+        )
 
     email_message = EmailMessage()
     email_message["From"] = EMAIL_USER
-    email_message["Reply-To"] = email
     email_message["To"] = EMAIL_USER
-    email_message["Subject"] = f"Portfolio Contact: New message from {name}"
-    
-    # Create a nicely formatted email body
-    body = f"""
-    New Contact Form Submission
-    
-    From: {name}
-    Email: {email}
-    
-    Message:
-    {message}
-    
-    ---
-    This message was sent from your portfolio contact form.
-    Reply to: {email}
-    """
-    
-    email_message.set_content(body)
+    email_message["Reply-To"] = email
+    email_message["Subject"] = f"Portfolio Contact: {name}"
+
+    email_message.set_content(
+        f"""
+New Contact Form Submission
+
+Name: {name}
+Email: {email}
+
+Message:
+{message}
+
+---
+Sent from your portfolio website.
+"""
+    )
 
     try:
         await aiosmtplib.send(
@@ -70,7 +69,10 @@ async def send_email(
             username=EMAIL_USER,
             password=EMAIL_PASS,
         )
-        return {"message": "Email sent successfully!", "success": True}
+        return {"success": True, "message": "Email sent successfully"}
     except Exception as e:
-        print(f"Error sending email: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to send email. Please try again later.")
+        print("Email error:", e)
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to send email"
+        )
