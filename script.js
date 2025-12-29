@@ -117,7 +117,7 @@ document.getElementById('contactForm').addEventListener('submit', async function
         submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
         
         // Send data to backend
-        const response = await fetch('http://127.0.0.1:8000/send-email', {
+        const response = await fetch("https://portfolio-71fp.onrender.com/send-email", {
             method: 'POST',
             body: formData
         });
